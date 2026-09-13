@@ -1,0 +1,6 @@
+# Image to Text (OCR - Optical Character Recognition)
+
+This project here is for OCR project.
+It does two things :
+    - Image / Document / PDF to text retrieval
+    - Hardwriting (image) to text retrieval
