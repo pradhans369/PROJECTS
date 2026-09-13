@@ -1,6 +1,11 @@
 # Image to Text (OCR - Optical Character Recognition)
 
-This project here is for OCR project.
+This project here is for OCR project. 
+THIS IS A LOCALLY DEPLOYABLE PROJECT
+
 It does two things :
     - Image / Document / PDF to text retrieval
+        - Tools used 
+            - 'pytesseract'     --> Scanned documents, books, clean PDFs                (works with images, and different document types)
     - Hardwriting (image) to text retrieval
+        -  TrOCR (Transformer-based OCR) by microsoft
