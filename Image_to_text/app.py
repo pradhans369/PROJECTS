@@ -47,6 +47,7 @@ st.write("---")
 
 # ---------------------------------------------------------------------------------------------------
 
+# taking input
 st.markdown("### Select file")
 file = st.file_uploader("File", type=['.jpg','.jpeg','.png','.pdf'])
 
@@ -55,6 +56,7 @@ col1, col2 = st.columns([1,2])
 if file is not None:
     file_name = file.name.lower()
 
+    # for image input
     if file_name.endswith(('.jpg','.jpeg','.png')):             # for multiple values the '.endswith' only takes tuples
         img = Image.open(file)
         with col1:
@@ -63,6 +65,7 @@ if file is not None:
             text = pyt.pytesseract.image_to_string(img)
             st.text(text)
 
+    # for pdf input
     elif file_name.endswith('.pdf'):
         pdf = pdfium.PdfDocument(file)
         with col1:
