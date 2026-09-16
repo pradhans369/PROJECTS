@@ -1,2 +1,8 @@
+# For OCR Project
 tesseract-ocr
 tesseract-ocr-eng
+
+# For Object Detection / OpenCV Project
+libgl1
+libgl1-mesa-glx
+libglib2.0-0
