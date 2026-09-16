@@ -28,7 +28,7 @@ st.markdown(
 
 # ---------------------------------------------------------------------------------------------------
 
-st.set_page_config(layout='wide')
+st.set_page_config('OCR', layout='wide')
 st.title('OCR - pytesserect and pypdfium')
 
 
