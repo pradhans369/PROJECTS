@@ -42,7 +42,7 @@ st.write(
 )
 st.write(
     "This project showcases the use of OCR using **pytesseract** and **pypdfium2**"
-    "for extracting texts from image and PDF-based files."
+    " for extracting texts from image and PDF-based files."
 )
 st.write("---")
 
