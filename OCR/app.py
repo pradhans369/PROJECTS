@@ -50,7 +50,7 @@ st.write("---")
 
 # taking input
 st.markdown("### Select file")
-file = st.file_uploader("File", type=['.jpg','.jpeg','.png','.pdf'])
+file = st.file_uploader("Image and PDFs only", type=['.jpg','.jpeg','.png','.pdf'])
 
 col1, col2 = st.columns([1,2])
 
