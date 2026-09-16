@@ -22,14 +22,19 @@ st.set_page_config('objDetection', layout='wide')
 
 st.markdown(
     """
-    <div style='display: flex; justify-content: flex-end; align-items: center; margin-bottom: 5px;'>
-        <b style='margin-right: 15px; font-size: 16px;'>Credits : </b>
-        <a href='https://github.com/pradhans369' target='_blank'>
-            <img src='https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white' style='margin-right: 10px;'>
-        </a>
-        <a href='https://www.linkedin.com/in/pradhans369/' target='_blank'>
-            <img src='https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white'>
-        </a>
+    <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
+        <div style='display: inline-flex; align-items: center; background-color: rgba(255, 255, 255, 0.05); 
+                    padding: 6px 14px; border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1);'>
+            <b style='margin-right: 12px; font-size: 15px;'>Credits :</b>
+            <a href='https://github.com/pradhans369' target='_blank'>
+                <img src='https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white' 
+                     style='border-radius: 6px; margin-right: 8px;'>
+            </a>
+            <a href='https://www.linkedin.com/in/pradhans369/' target='_blank'>
+                <img src='https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white' 
+                     style='border-radius: 6px;'>
+            </a>
+        </div>
     </div>
     """, 
     unsafe_allow_html=True
