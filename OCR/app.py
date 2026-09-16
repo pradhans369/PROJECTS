@@ -4,6 +4,8 @@ import pypdfium2 as pdfium
 from PIL import Image
 
 
+st.set_page_config('OCR', layout='wide')
+
 # ---------------------------------------------------------------------------------------------------
 
 st.markdown(
@@ -28,7 +30,6 @@ st.markdown(
 
 # ---------------------------------------------------------------------------------------------------
 
-st.set_page_config('OCR', layout='wide')
 st.title('OCR - pytesserect and pypdfium')
 
 
