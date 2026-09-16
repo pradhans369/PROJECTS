@@ -61,8 +61,10 @@ if file is not None:
     if file_name.endswith(('.jpg','.jpeg','.png')):             # for multiple values the '.endswith' only takes tuples
         img = Image.open(file)
         with col1:
+            st.header("Selected Image", divider='gray')
             st.image(img)
         with col2:
+            st.header("Extracted Text from Image", divider='gray')
             text = pyt.pytesseract.image_to_string(img)
             st.text(text)
 
