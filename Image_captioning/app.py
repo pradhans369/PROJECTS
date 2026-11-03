@@ -1,3 +1,5 @@
+import io
+import requests
 import torch
 from PIL import Image
 import streamlit as st
@@ -8,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-
+# Credits section
 st.markdown(
     """
     <div style='display: flex; justify-content: flex-end; margin-bottom: 10px;'>
@@ -28,7 +30,6 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
-
 
 # Custom styling
 st.markdown(
@@ -62,12 +63,17 @@ st.markdown(
         letter-spacing: 0.5px;
         margin-bottom: 0.5rem;
     }
+    /* Hide input instructions like "Press Enter to apply" */
+    div[data-testid="stTextInputInstructions"],
+    div[data-testid="InputInstructions"],
+    div[data-testid="stTextInput"] small,
+    div[data-testid="stTextAreaInstructions"] {
+        display: none !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
-
-
 
 @st.cache_resource(show_spinner=False)
 def load_model():
@@ -85,7 +91,7 @@ st.markdown('<div class="main-header">Image Captioning System</div>', unsafe_all
 st.markdown(
     '<div class="sub-header">'
     'An automated visual description engine powered by the Salesforce BLIP (Bootstrapping Language-Image Pre-training) '
-    'multimodal architecture. Upload an image to generate a syntactically grounded, context-aware description.'
+    'multimodal architecture. Upload an image or provide a link to generate a syntactically grounded, context-aware description.'
     '</div>',
     unsafe_allow_html=True
 )
@@ -100,56 +106,94 @@ with st.expander("Technical Specifications"):
         """
     )
 
+# Input method selection above the columns
+input_method = st.radio(
+    "Select Input Method",
+    options=["File Upload", "Image URL"],
+    horizontal=True
+)
 
-
-# Two-column layout
+# Two-column layout: Left (Input & Image Preview) | Right (Action Button & Generated Caption)
 col_left, col_right = st.columns([1.1, 1], gap="large")
 
-with col_left:
-    uploaded_file = st.file_uploader(
-        "Choose an image",
-        type=["jpg", "jpeg", "png", "webp"],
-        label_visibility="collapsed"
-    )
+image = None
+source_id = None
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
+with col_left:
+    if input_method == "File Upload":
+        uploaded_file = st.file_uploader(
+            "Choose an image",
+            type=["jpg", "jpeg", "png", "webp"]
+        )
+        if uploaded_file is not None:
+            try:
+                image = Image.open(uploaded_file).convert("RGB")
+                source_id = uploaded_file.name
+            except Exception as e:
+                st.error(f"Failed to read image file: {e}")
+
+    else:
+        url_input = st.text_input(
+            "Image URL",
+            placeholder="https://example.com/image.jpg"
+        )
+        if url_input.strip():
+            try:
+                headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+                resp = requests.get(url_input.strip(), headers=headers, timeout=12)
+                resp.raise_for_status()
+                image = Image.open(io.BytesIO(resp.content)).convert("RGB")
+                source_id = url_input.strip()
+            except requests.exceptions.RequestException:
+                st.error("Unable to retrieve image from the provided URL. Please verify the URL is accessible.")
+            except Exception:
+                st.error("The provided URL does not point to a valid image format.")
+
+    if image is not None:
         st.image(image, use_container_width=True)
     else:
-        st.info("Upload an image (PNG, JPG, JPEG, WEBP) to begin.")
+        st.info("Provide an image via file upload or URL to begin.")
 
 with col_right:
-    if uploaded_file is not None:
-        # Button placed on the right side of the photo
-        generate_clicked = st.button("Generate Caption", type="primary", use_container_width=True)
+    # Top spacing to vertically align the button directly with the input field
+    st.markdown("<div style='margin-top: 29px;'></div>", unsafe_allow_html=True)
+    generate_clicked = st.button(
+        "Generate Caption",
+        type="primary",
+        use_container_width=True,
+        disabled=(image is None)
+    )
 
-        # Track previous caption in session state to persist across renders
-        if "last_file" not in st.session_state or st.session_state["last_file"] != uploaded_file.name:
-            st.session_state["last_file"] = uploaded_file.name
-            st.session_state["caption"] = None
+    # Synchronize session state: clear caption immediately if image is removed or changed
+    if image is None:
+        st.session_state["caption"] = None
+        st.session_state["last_source"] = None
+    elif st.session_state.get("last_source") != source_id:
+        st.session_state["last_source"] = source_id
+        st.session_state["caption"] = None
 
-        if generate_clicked:
-            with st.spinner("Analyzing image..."):
-                inputs = processor(images=image, return_tensors="pt").to(device)
-                
-                with torch.no_grad():
-                    output_tokens = model.generate(
-                        **inputs,
-                        num_beams=5,
-                        max_new_tokens=30,
-                        min_length=8,
-                        repetition_penalty=1.2
-                    )
+    if generate_clicked and image is not None:
+        with st.spinner("Analyzing image..."):
+            inputs = processor(images=image, return_tensors="pt").to(device)
+            
+            with torch.no_grad():
+                output_tokens = model.generate(
+                    **inputs,
+                    num_beams=5,
+                    max_new_tokens=30,
+                    min_length=8,
+                    repetition_penalty=1.2
+                )
 
-                st.session_state["caption"] = processor.decode(output_tokens[0], skip_special_tokens=True).strip()
+            st.session_state["caption"] = processor.decode(output_tokens[0], skip_special_tokens=True).strip()
 
-        if st.session_state.get("caption"):
-            st.markdown(
-                f"""
-                <div class="caption-box">
-                    <div class="caption-title">Generated Caption</div>
-                    {st.session_state['caption']}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    if image is not None and st.session_state.get("caption"):
+        st.markdown(
+            f"""
+            <div class="caption-box">
+                <div class="caption-title">Generated Caption</div>
+                {st.session_state['caption']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
